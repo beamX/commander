@@ -11,7 +11,7 @@ Service to run and monitor OS processes.
 defmodule Commander.Daemons do
   def get_spec() do
     %{
-      sleep: %{
+      sleep_500: %{
         command: "sleep",
         arg_list: ["500"],
         options: []
