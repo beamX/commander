@@ -5,9 +5,18 @@ defmodule Commander.MixProject do
     [
       app: :commander,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: [
+        commander: [
+          cookie: "secret-cookie-value",
+          include_erts: true,
+          include_executables_for: [:unix],
+          applications: [commander: :permanent, runtime_tools: :permanent],
+          steps: [:assemble, :tar]
+        ]
+      ]
     ]
   end
 
