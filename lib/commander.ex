@@ -8,7 +8,8 @@ defmodule Commander do
     Application.get_env(:commander, :daemons_config_file) |> Code.compile_file()
 
     Commander.Daemons.get_spec()
-    |> Enum.map(fn {id, spec} -> {id, Map.put(spec, :id, id)} end) |> Enum.into(%{})
+    |> Enum.map(fn {id, spec} -> {id, Map.put(spec, :id, id)} end)
+    |> Enum.into(%{})
     |> ensure_all_started()
   end
 
@@ -26,7 +27,7 @@ defmodule Commander do
       {id, _pid, _type, _modules} = process
 
       # id is not in the list of daemons, so we need to kill it
-      if not Map.get(daemons, id, false) do
+      if Map.get(daemons, id, false) == false do
         [id | acc]
       else
         acc
@@ -75,7 +76,8 @@ defmodule Commander do
     Supervisor.child_spec(
       {MuonTrap.Daemon, [daemon_spec.command, daemon_spec.arg_list, daemon_spec.options]},
       id: daemon_spec.id,
-      shutdown: 10_000
+      shutdown: 10_000,
+      restart: :transient
     )
   end
 end
