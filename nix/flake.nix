@@ -29,18 +29,24 @@
         # Declare the Elixir version you want to use. If not, defaults to the latest on this channel.
         elixir = pkgs.elixir_1_16;
 
+        pkgVersion = "0.1.0-rev-" + pkgs.lib.strings.removeSuffix "-dirty" (self.shortRev or self.dirtyShortRev);
+
         # Import a development shell we'll declare in `shell.nix`.
         devShell = import ./shell.nix { inherit pkgs elixir beamPackages; };
 
         commander-app = let
           lib = pkgs.lib;
+
           # Import the Mix deps into Nix by running, mix2nix > nix/deps.nix
           mixNixDeps = import ./deps.nix { inherit lib beamPackages; };
         in beamPackages.mixRelease {
           pname = "commander";
           # Elixir app source path
           src = ../.;
-          version = "0.1.0";
+
+          version = pkgVersion;
+
+          MIX_RELEASE_VSN = pkgVersion;
 
           inherit mixNixDeps;
 

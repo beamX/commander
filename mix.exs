@@ -4,7 +4,7 @@ defmodule Commander.MixProject do
   def project do
     [
       app: :commander,
-      version: "0.1.1",
+      version: version(Mix.env()),
       elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -18,6 +18,20 @@ defmodule Commander.MixProject do
         ]
       ]
     ]
+  end
+
+  def version(:dev), do: "0.1.0"
+
+  def version(_) do
+    release_vsn = System.get_env("MIX_RELEASE_VSN")
+
+    if !release_vsn do
+      raise """
+      environment variable MIX_RELEASE_VSN is required but not set
+      """
+    end
+
+    release_vsn
   end
 
   # Run "mix help compile.app" to learn about applications.
