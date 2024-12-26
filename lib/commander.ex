@@ -8,9 +8,14 @@ defmodule Commander do
     Application.get_env(:commander, :daemons_config_file) |> Code.compile_file()
 
     Commander.Daemons.get_spec()
+    |> start_from_config()
+  end
+
+  def start_from_config(daemon_spec, dry_run \\ false) do
+    daemon_spec
     |> Enum.map(fn {id, spec} -> {id, Map.put(spec, :id, id)} end)
     |> Enum.into(%{})
-    |> ensure_all_started()
+    |> ensure_all_started(dry_run)
   end
 
   @doc """
