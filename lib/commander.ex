@@ -78,8 +78,12 @@ defmodule Commander do
   Generate worker spec from a configuration list
   """
   def generate_childspec(daemon_spec) do
+    child_map = %{
+      id: daemon_spec.id,
+      start: {:exec, :run_link, [daemon_spec.command, daemon_spec.options]}
+    }
     Supervisor.child_spec(
-      {MuonTrap.Daemon, [daemon_spec.command, daemon_spec.arg_list, daemon_spec.options]},
+      child_map,
       id: daemon_spec.id,
       shutdown: 10_000,
       restart: :transient

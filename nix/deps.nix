@@ -21,6 +21,19 @@ let
       beamDeps = [];
     };
 
+    erlexec = buildRebar3 rec {
+      name = "erlexec";
+      version = "2.2.0";
+
+      src = fetchHex {
+        pkg = "erlexec";
+        version = "${version}";
+        sha256 = "19e4e1c170de5594da1c67a8a9a0defae0bc407e138a70b14fea031fe9e67347";
+      };
+
+      beamDeps = [];
+    };
+
     muontrap = buildMix rec {
       name = "muontrap";
       version = "1.5.0";

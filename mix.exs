@@ -45,7 +45,7 @@ defmodule Commander.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:muontrap, "~> 1.5"}
+      {:erlexec, "~> 2.0"}
     ]
   end
 end

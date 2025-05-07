@@ -24,10 +24,10 @@
         # Declare BEAM version we want to use.
         # NOTE: using pkgs.erlang instead of pkgs.beam.interpreters.erlang_* to
         # avoid buidling erlang
-        beamPackages = pkgs.beam.packagesWith pkgs.erlang;
+        beamPackages = pkgs.beam.packagesWith pkgs.erlang_27;
 
         # Declare the Elixir version you want to use. If not, defaults to the latest on this channel.
-        elixir = pkgs.elixir_1_16;
+        elixir = beamPackages.elixir_1_16;
 
         pkgVersion = "0.1.0-rev-" + pkgs.lib.strings.removeSuffix "-dirty" (self.shortRev or self.dirtyShortRev);
 

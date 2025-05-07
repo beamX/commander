@@ -9,8 +9,10 @@
     elixir
     rebar3
     mix2nix
+    beamPackages.erlang
     # iex complains about locale being set to latin1
     glibcLocales
+    libcap
   ];
 
   # Add basePackages + optional system packages per system
