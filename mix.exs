@@ -5,7 +5,7 @@ defmodule Commander.MixProject do
     [
       app: :commander,
       version: version(Mix.env()),
-      elixir: "~> 1.16",
+      elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: [

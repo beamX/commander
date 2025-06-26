@@ -11,6 +11,14 @@ defmodule Commander do
     |> start_from_config()
   end
 
+  @doc """
+    daemon_sepc = %{
+      service_id: %{
+        command: "/path/to/executable",
+        options: []
+      }
+    }
+  """
   def start_from_config(daemon_spec, dry_run \\ false) do
     daemon_spec
     |> Enum.map(fn {id, spec} -> {id, Map.put(spec, :id, id)} end)

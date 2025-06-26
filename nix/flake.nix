@@ -9,7 +9,7 @@
   description = "Commander: service to run and manage OS processes";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=25.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -27,7 +27,7 @@
         beamPackages = pkgs.beam.packagesWith pkgs.erlang_27;
 
         # Declare the Elixir version you want to use. If not, defaults to the latest on this channel.
-        elixir = beamPackages.elixir_1_16;
+        elixir = beamPackages.elixir_1_17;
 
         pkgVersion = "0.1.0-rev-" + pkgs.lib.strings.removeSuffix "-dirty" (self.shortRev or self.dirtyShortRev);
 
