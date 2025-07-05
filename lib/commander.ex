@@ -70,16 +70,36 @@ defmodule Commander do
   end
 
   def start_process(daemon_spec) do
-    Supervisor.start_child(Commander.Supervisor, generate_childspec(daemon_spec))
+    daemon_supervisor_id = to_daemon_supervisor_id(daemon_spec.id)
+    Supervisor.start_child(Commander.Supervisor, generate_daemon_supervisor_spec(daemon_supervisor_id))
+    Supervisor.start_child(daemon_supervisor_id, generate_childspec(daemon_spec))
   end
 
   def stop_process(child_id) do
-    Supervisor.terminate_child(Commander.Supervisor, child_id)
-    Supervisor.delete_child(Commander.Supervisor, child_id)
+    daemon_supervisor_id = to_daemon_supervisor_id(child_id)
+    Supervisor.terminate_child(daemon_supervisor_id, child_id)
+    Supervisor.terminate_child(Commander.Supervisor, daemon_supervisor_id)
+    Supervisor.delete_child(Commander.Supervisor, daemon_supervisor_id)
   end
 
   def get_running_processes do
     Supervisor.which_children(Commander.Supervisor)
+    |> Enum.map(fn {id, _, _, _} ->
+      Supervisor.which_children(id)
+    end)
+    |> List.flatten()
+  end
+
+  def generate_daemon_supervisor_spec(id) do
+    child_map = %{
+      id: id,
+      start: {Supervisor, :start_link, []},
+    }
+    Supervisor.child_spec(
+      child_map,
+      shutdown: 10_000,
+      restart: :transient
+    )
   end
 
   @doc """
@@ -96,5 +116,9 @@ defmodule Commander do
       shutdown: 10_000,
       restart: :transient
     )
+  end
+
+  defp to_daemon_supervisor_id(daemon_id) do
+    String.to_atom("sup_#{daemon_id}")
   end
 end
