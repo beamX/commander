@@ -33,6 +33,7 @@ defmodule Commander do
   NOTE: to restart a existing process give it a new id
   """
   def ensure_all_started(daemons, dry_run \\ false) do
+    cleanup_exited_daemon_supervisors()
     running_processes = get_running_processes()
     running_process_ids = Enum.map(running_processes, fn {id, _, _, _} -> id end)
 
@@ -88,6 +89,16 @@ defmodule Commander do
     Supervisor.terminate_child(daemon_supervisor_id, child_id)
     Supervisor.terminate_child(Commander.Supervisor, daemon_supervisor_id)
     Supervisor.delete_child(Commander.Supervisor, daemon_supervisor_id)
+  end
+
+  def cleanup_exited_daemon_supervisors() do
+    Supervisor.which_children(Commander.Supervisor)
+    |> Enum.filter(fn {_, pid, _, _} ->
+      pid == :undefined
+    end)
+    |> Enum.map(fn {id, _, _, _} ->
+      Supervisor.delete_child(Commander.Supervisor, id)
+    end)
   end
 
   def get_running_processes do
