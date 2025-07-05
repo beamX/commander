@@ -86,9 +86,22 @@ defmodule Commander do
 
   def stop_process(child_id) do
     daemon_supervisor_id = to_daemon_supervisor_id(child_id)
-    Supervisor.terminate_child(daemon_supervisor_id, child_id)
+    {:ok, daemon_supervisor_pid} = get_daemon_supervisor_by_id(daemon_supervisor_id)
+
+    Supervisor.terminate_child(daemon_supervisor_pid, child_id)
     Supervisor.terminate_child(Commander.Supervisor, daemon_supervisor_id)
     Supervisor.delete_child(Commander.Supervisor, daemon_supervisor_id)
+  end
+
+  def get_daemon_supervisor_by_id(id) do
+    Supervisor.which_children(Commander.Supervisor)
+    |> Enum.filter(fn {child_id, _, _, _} -> child_id == id end)
+    |> case do
+         [{_, daemon_supervisor_pid, _, _}] ->
+           {:ok, daemon_supervisor_pid}
+         [] ->
+           {:error, nil}
+       end
   end
 
   def cleanup_exited_daemon_supervisors() do
@@ -103,8 +116,8 @@ defmodule Commander do
 
   def get_running_processes do
     Supervisor.which_children(Commander.Supervisor)
-    |> Enum.map(fn {id, _, _, _} ->
-      Supervisor.which_children(id)
+    |> Enum.map(fn {_, pid, _, _} ->
+      Supervisor.which_children(pid)
     end)
     |> List.flatten()
   end
