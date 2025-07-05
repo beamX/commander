@@ -71,8 +71,8 @@ defmodule Commander do
 
   def start_process(daemon_spec) do
     daemon_supervisor_id = to_daemon_supervisor_id(daemon_spec.id)
-    Supervisor.start_child(Commander.Supervisor, generate_daemon_supervisor_spec(daemon_supervisor_id))
-    Supervisor.start_child(daemon_supervisor_id, generate_childspec(daemon_spec))
+    {:ok, sup_pid} = Supervisor.start_child(Commander.Supervisor, generate_daemon_supervisor_spec(daemon_supervisor_id))
+    Supervisor.start_child(sup_pid, generate_childspec(daemon_spec))
   end
 
   def stop_process(child_id) do
@@ -91,10 +91,13 @@ defmodule Commander do
   end
 
   def generate_daemon_supervisor_spec(id) do
+    opts = [strategy: :one_for_one]
+
     child_map = %{
       id: id,
-      start: {Supervisor, :start_link, []},
+      start: {Supervisor, :start_link, [[], opts]},
     }
+
     Supervisor.child_spec(
       child_map,
       shutdown: 10_000,
