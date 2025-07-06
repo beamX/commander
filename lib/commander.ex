@@ -88,17 +88,27 @@ defmodule Commander do
     daemon_supervisor_id = to_daemon_supervisor_id(child_id)
     {:ok, daemon_supervisor_pid} = get_daemon_supervisor_by_id(daemon_supervisor_id)
 
-    Supervisor.terminate_child(daemon_supervisor_pid, child_id)
+    [{^child_id, pid, _, _}] = Supervisor.which_children(daemon_supervisor_pid)
+
+    # https://hexdocs.pm/erlexec/exec.html#stop_and_wait/2
+    :exec.stop_and_wait(pid)
+
+    # Supervisor.terminate_child(daemon_supervisor_pid, child_id)
     Supervisor.terminate_child(Commander.Supervisor, daemon_supervisor_id)
     Supervisor.delete_child(Commander.Supervisor, daemon_supervisor_id)
   end
 
   def get_daemon_supervisor_by_id(id) do
     Supervisor.which_children(Commander.Supervisor)
+    |> find_sup_child_by_id(id)
+  end
+
+  defp find_sup_child_by_id(children, id) do
+    children
     |> Enum.filter(fn {child_id, _, _, _} -> child_id == id end)
     |> case do
-         [{_, daemon_supervisor_pid, _, _}] ->
-           {:ok, daemon_supervisor_pid}
+         [{_, pid, _, _}] ->
+           {:ok, pid}
          [] ->
            {:error, nil}
        end
