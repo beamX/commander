@@ -5,27 +5,35 @@ Service to run and monitor OS processes.
 
 ## Quick example
 
-1. Define a elixir script module `Commander.Daemons` with `get_spec` function which returns processes which should be running,
+1. Define a map which contains all processes which should be running,
 
 ``` elixir
-defmodule Commander.Daemons do
-  def get_spec() do
-    %{
-      sleep_500: %{
-        command: "sleep",
-        arg_list: ["500"],
-        options: []
-      }
-    }
-  end
-end
+daemons = %{
+  custom_service: %{
+    command: "customer_service start",
+    options: []
+  },
+  haproxy: %{
+    command: "haproxy -f /home/user/haproxy/haproxy.cfg -p /home/user/haproxy/run/haproxy.pid",
+    options: []
+  }
+}
 ```
 
-2. Configure the path of the elixir script containing the list of processes to run and monitor
+NOTE: Ensure that the commands are avaiable to user under which the `commander`
+service is running
+
+2. Start the services using the following command
 
 ``` elixir
-Application.get_env(:commander, :daemons_config_file) # "/home/user/workspace/commander/daemon.exs"
+Commander.start_from_config(daemons)
 ```
 
-3. Lastly invoke `Commander.sync_config()` which will ensure that all processes returned by `Commander.Daemons.get_spec()` are running.
-NOTE: Any process which are currently running but no longer returned by `get_spec()` will be stopped.
+## Intent
+
+`commander` service is intended to be used in with
+[control-node](https://github.com/beamX/control-node) i.e. `control-node`
+library enables building a custom orchestrator which can deploy elixir services.
+`commander` is an elixir service which runs and manages non elixir processes. So,
+`control-node` in conjunction with `commander` can run and manage elixir and
+non-elixir services across a fleet of servers.

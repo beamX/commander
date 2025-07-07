@@ -91,7 +91,7 @@ defmodule Commander do
     [{^child_id, pid, _, _}] = Supervisor.which_children(daemon_supervisor_pid)
 
     # https://hexdocs.pm/erlexec/exec.html#stop_and_wait/2
-    :exec.stop_and_wait(pid)
+    :exec.stop_and_wait(pid, 10_000)
 
     # Supervisor.terminate_child(daemon_supervisor_pid, child_id)
     Supervisor.terminate_child(Commander.Supervisor, daemon_supervisor_id)
